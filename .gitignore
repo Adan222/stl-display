@@ -1,0 +1,5 @@
+.vscode/
+build/
+.cache/
+src/config.hpp
+compile_commands.json
