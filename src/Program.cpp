@@ -2,13 +2,13 @@
 
 #include <stdexcept>
 
+// OpenGL classes
 #include "ElementBufferObject.hpp"
+#include "Shader.hpp"
+#include "ShaderProgram.hpp"
 #include "Texture.hpp"
-#include "VertexBufferObject.hpp"
-
 #include "VertexArrayObject.hpp"
-#include "shader.hpp"
-#include "shader_program.hpp"
+#include "VertexBufferObject.hpp"
 
 struct VertexPosition {
     float x;
