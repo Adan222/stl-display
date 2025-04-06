@@ -12,6 +12,7 @@ set(CMAKE_BUILD_TYPE Debug)
 configure_file(${CMAKE_SOURCE_DIR}/src/config.hpp.in ${CMAKE_SOURCE_DIR}/src/config.hpp)
 
 add_subdirectory(deps/glad)
+add_subdirectory(deps/stb)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -24,4 +25,6 @@ add_executable(stl_display ${SRC_FILES})
 target_link_libraries(stl_display PRIVATE OpenGL::GL)
 target_link_libraries(stl_display PRIVATE glfw)
 target_link_libraries(stl_display PRIVATE glad)
+target_link_libraries(stl_display PRIVATE stb)
+
 
