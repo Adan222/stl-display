@@ -18,9 +18,11 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
 # Find all .cpp files in src/ and store them in SRC_FILES
-file(GLOB SRC_FILES src/*.cpp)
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp src/*.h)
 
 add_executable(stl_display ${SRC_FILES})
+
+target_include_directories(stl_display PRIVATE src/)
 
 target_link_libraries(stl_display PRIVATE OpenGL::GL)
 target_link_libraries(stl_display PRIVATE glfw)

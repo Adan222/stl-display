@@ -11,11 +11,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // OpenGL classes
-#include "Shader.hpp"
-#include "ShaderProgram.hpp"
-#include "Texture.hpp"
-#include "VertexArrayObject.hpp"
-#include "VertexBufferObject.hpp"
+#include "opengl/Shader.hpp"
+#include "opengl/ShaderProgram.hpp"
+#include "opengl/Texture.hpp"
+#include "opengl/VertexArrayObject.hpp"
+#include "opengl/VertexBufferObject.hpp"
 
 struct VertexPosition {
     float x;
