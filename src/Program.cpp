@@ -1,9 +1,16 @@
 #include "Program.hpp"
 
+#include <cmath>
 #include <stdexcept>
 
+// GLM
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 // OpenGL classes
-#include "ElementBufferObject.hpp"
 #include "Shader.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
@@ -65,6 +72,7 @@ void Program::initOpenGL() {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         throw std::runtime_error("Failed to initialize GLAD!");
 
+    // Create basic viewport
     glViewport(0, 0, _window_width, _widnow_height);
 
     /** ===== GLFW Callbacks ===== */
@@ -72,6 +80,9 @@ void Program::initOpenGL() {
         glViewport(0, 0, width, height);
     };
     glfwSetFramebufferSizeCallback(_window, framebuffer_size_callback);
+
+    /** OpenGL extensions */
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Program::processInput() {
@@ -103,26 +114,57 @@ void Program::run() {
     vao.bind();
 
     // VBO
-    Vertex rectangleVertices[] = {
-        // Position              // Color
-        { { -0.5f, 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } }, // Left Top
-        { { 0.5f, 0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f } },  // Right Top
+    Vertex vertices[] = { // Back face (red)
+                          { { -0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
+                          { { 0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } },
+                          { { 0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
+                          { { 0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
+                          { { -0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } },
+                          { { -0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
 
-        { { -0.5f, -0.5f, 0.0 }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } }, // Left Bottom
-        { { 0.5f, -0.5f, 0.0 }, { 1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },  // Right Bottom
+                          // Front face (green)
+                          { { -0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
+                          { { 0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
+                          { { 0.5f, 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f } },
+                          { { 0.5f, 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f } },
+                          { { -0.5f, 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } },
+                          { { -0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
+
+                          // Left face (blue)
+                          { { -0.5f, 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
+                          { { -0.5f, 0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
+                          { { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
+                          { { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
+                          { { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
+                          { { -0.5f, 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
+
+                          // Right face (yellow)
+                          { { 0.5f, 0.5f, 0.5f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
+                          { { 0.5f, 0.5f, -0.5f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f } },
+                          { { 0.5f, -0.5f, -0.5f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } },
+                          { { 0.5f, -0.5f, -0.5f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } },
+                          { { 0.5f, -0.5f, 0.5f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
+                          { { 0.5f, 0.5f, 0.5f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
+
+                          // Bottom face (cyan)
+                          { { -0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
+                          { { 0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+                          { { 0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
+                          { { 0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
+                          { { -0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
+                          { { -0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
+
+                          // Top face (magenta)
+                          { { -0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
+                          { { 0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
+                          { { 0.5f, 0.5f, 0.5f }, { 1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
+                          { { 0.5f, 0.5f, 0.5f }, { 1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
+                          { { -0.5f, 0.5f, 0.5f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
+                          { { -0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } }
     };
 
     VertexBufferObject vbo;
-    vbo.setData(rectangleVertices, sizeof(rectangleVertices));
-
-    // EBO
-    unsigned int indices[] = {
-        0, 1, 2, // Upper triangle
-        1, 2, 3  // Lower triangle
-    };
-
-    ElementBufferObject ebo;
-    ebo.setData(indices, sizeof(indices));
+    vbo.setData(vertices, sizeof(vertices));
 
     // Configure attributes
     // Vertex position
@@ -159,15 +201,33 @@ void Program::run() {
     Texture face_texture(1);
     face_texture.loadImage("/awesomeface.png");
 
+    // Assign texture units
     shaderProgram.useProgram();
     shaderProgram.setUniformInt("Texture0", 0);
     shaderProgram.setUniformInt("Texture1", 1);
 
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    glm::mat4 projection = glm::mat4(1.0f);
+    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    shaderProgram.useProgram();
+    shaderProgram.setUniformMatrix4f("view", glm::value_ptr(view));
+    shaderProgram.setUniformMatrix4f("projection", glm::value_ptr(projection));
+
     while (!glfwWindowShouldClose(_window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         processInput();
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model,
+                            (float)glfwGetTime() * glm::radians(50.0f),
+                            glm::vec3(0.5f, 1.0f, 0.0f));
+
+        shaderProgram.setUniformMatrix4f("model", glm::value_ptr(model));
 
         // Draw triangle
         shaderProgram.useProgram();
@@ -175,7 +235,7 @@ void Program::run() {
         brick_texture.bindTexture();
         face_texture.bindTexture();
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(_window);
         glfwPollEvents();

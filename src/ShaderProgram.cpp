@@ -46,3 +46,10 @@ void ShaderProgram::setUniform4f(
     const int location = glGetUniformLocation(this->_id, name.c_str());
     glUniform4f(location, v0, v1, v2, v3);
 }
+
+/** Matrices */
+
+void ShaderProgram::setUniformMatrix4f(const std::string &name, const float *v) {
+    const int location = glGetUniformLocation(this->_id, name.c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, v);
+}
