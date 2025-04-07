@@ -1,224 +1,50 @@
 #include "Program.hpp"
 
 #include <cmath>
-#include <stdexcept>
 
-// GLM
+/** GLM */
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// OpenGL classes
-#include "opengl/Shader.hpp"
-#include "opengl/ShaderProgram.hpp"
-#include "opengl/Texture.hpp"
-#include "opengl/VertexArrayObject.hpp"
-#include "opengl/VertexBufferObject.hpp"
+/** Lib */
+#include "Window.hpp"
 
-struct VertexPosition {
-    float x;
-    float y;
-    float z;
-};
+/** STL */
+#include "stl/Entity.hpp"
 
-struct VertexColor {
-    float r;
-    float g;
-    float b;
-};
+Program::Program(unsigned int width, unsigned int height) : window("OpenGL", width, height) {}
 
-struct VertexTextureCoordinates {
-    float s;
-    float t;
-};
-
-struct Vertex {
-    VertexPosition position;
-    VertexColor color;
-    VertexTextureCoordinates texture;
-};
-
-Program::Program(unsigned int width, unsigned int height)
-    : _window_width(width), _widnow_height(height) {
-    initOpenGL();
-}
-
-Program::~Program() {
-    glfwDestroyWindow(_window);
-    glfwTerminate();
-}
-
-void Program::initOpenGL() {
-    // Initialize GLFW
-    if (!glfwInit())
-        throw std::runtime_error("Failed to initialize GLFW!");
-
-    // Set OpenGL version to 3.3 Core Profile
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // Create a window
-    _window = glfwCreateWindow(_window_width, _widnow_height, "OpenGL Test", nullptr, nullptr);
-    if (!_window)
-        throw std::runtime_error("Failed to create GLFW window!");
-
-    // Init OpenGL context
-    glfwMakeContextCurrent(_window);
-
-    // Load OpenGL function pointers with GLAD
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        throw std::runtime_error("Failed to initialize GLAD!");
-
-    // Create basic viewport
-    glViewport(0, 0, _window_width, _widnow_height);
-
-    /** ===== GLFW Callbacks ===== */
-    auto framebuffer_size_callback = [](GLFWwindow *window, int width, int height) -> void {
-        glViewport(0, 0, width, height);
-    };
-    glfwSetFramebufferSizeCallback(_window, framebuffer_size_callback);
-
-    /** OpenGL extensions */
-    glEnable(GL_DEPTH_TEST);
-}
+Program::~Program() {}
 
 void Program::processInput() {
-    if (glfwGetKey(_window, GLFW_KEY_ESCAPE))
-        glfwSetWindowShouldClose(_window, GLFW_TRUE);
+    auto win = window.getWindow();
+    if (glfwGetKey(win, GLFW_KEY_ESCAPE))
+        glfwSetWindowShouldClose(win, GLFW_TRUE);
 
-    if (glfwGetKey(_window, GLFW_KEY_0))
+    if (glfwGetKey(win, GLFW_KEY_0))
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    if (glfwGetKey(_window, GLFW_KEY_1))
+    if (glfwGetKey(win, GLFW_KEY_1))
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 void Program::run() {
-    // Create shaders
-    Shader fragmentShader(Shader::Type::Fragment, "fragment.frag");
-    fragmentShader.checkError();
-    Shader vertexShader(Shader::Type::Vertex, "vertex.vert");
-    vertexShader.checkError();
-
-    // Programs
-    ShaderProgram shaderProgram;
-    shaderProgram.attacheShader(vertexShader);
-    shaderProgram.attacheShader(fragmentShader);
-    shaderProgram.linkShaders();
-
-    // VAO
-    VertexArrayObject vao;
-    vao.bind();
-
-    // VBO
-    Vertex vertices[] = { // Back face (red)
-                          { { -0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
-                          { { 0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } },
-                          { { 0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
-                          { { 0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } },
-                          { { -0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } },
-                          { { -0.5f, -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } },
-
-                          // Front face (green)
-                          { { -0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
-                          { { 0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
-                          { { 0.5f, 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f } },
-                          { { 0.5f, 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f } },
-                          { { -0.5f, 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } },
-                          { { -0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
-
-                          // Left face (blue)
-                          { { -0.5f, 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
-                          { { -0.5f, 0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
-                          { { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
-                          { { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
-                          { { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
-                          { { -0.5f, 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
-
-                          // Right face (yellow)
-                          { { 0.5f, 0.5f, 0.5f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
-                          { { 0.5f, 0.5f, -0.5f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f } },
-                          { { 0.5f, -0.5f, -0.5f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } },
-                          { { 0.5f, -0.5f, -0.5f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f } },
-                          { { 0.5f, -0.5f, 0.5f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
-                          { { 0.5f, 0.5f, 0.5f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } },
-
-                          // Bottom face (cyan)
-                          { { -0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-                          { { 0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
-                          { { 0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-                          { { 0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-                          { { -0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-                          { { -0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-
-                          // Top face (magenta)
-                          { { -0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
-                          { { 0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
-                          { { 0.5f, 0.5f, 0.5f }, { 1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
-                          { { 0.5f, 0.5f, 0.5f }, { 1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
-                          { { -0.5f, 0.5f, 0.5f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
-                          { { -0.5f, 0.5f, -0.5f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } }
-    };
-
-    VertexBufferObject vbo;
-    vbo.setData(vertices, sizeof(vertices));
-
-    // Configure attributes
-    // Vertex position
-    AttributeConfiguration vertexConfig = { .index = 0,
-                                            .size = 3,
-                                            .dataType = AttributeConfiguration::Type::FLOAT,
-                                            .normalize = false,
-                                            .stride = sizeof(Vertex),
-                                            .startPointer = 0 };
-    vao.configureAttribute(vertexConfig);
-
-    // Vertex color
-    AttributeConfiguration colorConfig = { .index = 1,
-                                           .size = 3,
-                                           .dataType = AttributeConfiguration::Type::FLOAT,
-                                           .normalize = false,
-                                           .stride = sizeof(Vertex),
-                                           .startPointer = sizeof(VertexPosition) };
-    vao.configureAttribute(colorConfig);
-
-    // Vertex color
-    AttributeConfiguration textureConfig = { .index = 2,
-                                             .size = 2,
-                                             .dataType = AttributeConfiguration::Type::FLOAT,
-                                             .normalize = false,
-                                             .stride = sizeof(Vertex),
-                                             .startPointer = 6 * sizeof(float) };
-    vao.configureAttribute(textureConfig);
-
-    // Textures
-    Texture brick_texture(0);
-    brick_texture.loadImage("/woodencontainer.png");
-
-    Texture face_texture(1);
-    face_texture.loadImage("/awesomeface.png");
-
-    // Assign texture units
-    shaderProgram.useProgram();
-    shaderProgram.setUniformInt("Texture0", 0);
-    shaderProgram.setUniformInt("Texture1", 1);
+    stl::Entity entity;
+    entity.setup();
 
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    entity.view(view);
 
     glm::mat4 projection = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    entity.projection(projection);
 
-    shaderProgram.useProgram();
-    shaderProgram.setUniformMatrix4f("view", glm::value_ptr(view));
-    shaderProgram.setUniformMatrix4f("projection", glm::value_ptr(projection));
-
-    while (!glfwWindowShouldClose(_window)) {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    while (window.isOpen()) {
+        window.clear({ 0.2f, 0.3f, 0.3f, 1.0f });
 
         processInput();
 
@@ -226,18 +52,10 @@ void Program::run() {
         model = glm::rotate(model,
                             (float)glfwGetTime() * glm::radians(50.0f),
                             glm::vec3(0.5f, 1.0f, 0.0f));
+        entity.model(model);
 
-        shaderProgram.setUniformMatrix4f("model", glm::value_ptr(model));
+        window.draw(entity);
 
-        // Draw triangle
-        shaderProgram.useProgram();
-        vao.bind();
-        brick_texture.bindTexture();
-        face_texture.bindTexture();
-
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        glfwSwapBuffers(_window);
-        glfwPollEvents();
+        window.display();
     }
 }

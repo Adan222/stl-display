@@ -8,13 +8,12 @@
 
 #include <GLFW/glfw3.h>
 
+/** Lib */
+#include "Window.hpp"
+
 class Program {
   private:
-    GLFWwindow *_window;
-    unsigned int _window_width;
-    unsigned int _widnow_height;
-
-    void initOpenGL();
+    Window window;
 
     void processInput();
 
