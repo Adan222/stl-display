@@ -33,5 +33,5 @@ class ShaderProgram {
     void setUniform4f(const std::string &name, float v0, float v1, float v2, float v3) const;
 
     /** Matrices */
-    void setUniformMatrix4f(const std::string &name, const float *v);
+    void setUniformMatrix4f(const std::string &name, const float *v) const;
 };
