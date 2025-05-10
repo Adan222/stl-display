@@ -1,6 +1,7 @@
 #include "Program.hpp"
 
 #include <cmath>
+#include <iostream>
 
 /** GLM */
 #include <glm/ext/matrix_transform.hpp>
@@ -10,6 +11,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 /** Lib */
+#include "Event.hpp"
 #include "Window.hpp"
 
 /** STL */
@@ -21,14 +23,37 @@ Program::~Program() {}
 
 void Program::processInput() {
     auto win = window.getWindow();
-    if (glfwGetKey(win, GLFW_KEY_ESCAPE))
-        glfwSetWindowShouldClose(win, GLFW_TRUE);
 
-    if (glfwGetKey(win, GLFW_KEY_0))
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    while (Event event = window.poolEvents()) {
+        switch (event.type) {
+        case Event::Type::MouseButtonPressed: {
+            if (event.mouseButton.button == Event::MouseButton::Left)
+                std::cout << "Left clicked\n";
 
-    if (glfwGetKey(win, GLFW_KEY_1))
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            if (event.mouseButton.button == Event::MouseButton::Right)
+                std::cout << "Right clicked\n";
+
+            break;
+        }
+
+        case Event::Type::KeyPressed: {
+            std::cout << "Key: " << (int)event.keyEvent.key << "\n";
+            if (event.keyEvent.key == Event::Key::Escape)
+                glfwSetWindowShouldClose(win, GLFW_TRUE);
+
+            if (event.keyEvent.key == Event::Key::D0)
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+            if (event.keyEvent.key == Event::Key::D1)
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+            break;
+        }
+
+        default:
+            break;
+        }
+    }
 }
 
 void Program::run() {

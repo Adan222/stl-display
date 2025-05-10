@@ -2,8 +2,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include "Event.hpp"
-
 /** Callback methods */
 
 void WindowEventHandler::framebuffer_size_callback(GLFWwindow *window,
@@ -57,6 +55,28 @@ void WindowEventHandler::mouse_button_callback(GLFWwindow *window,
     _eventQueue.push(event);
 }
 
+void WindowEventHandler::key_callback(
+    GLFWwindow *window, int key, int scancode, int action, int mods) {
+    // Check type
+    Event::Type type = Event::Type::None;
+    switch (action) {
+    case GLFW_PRESS:
+        type = Event::Type::KeyPressed;
+        break;
+    case GLFW_RELEASE:
+        type = Event::Type::KeyReleased;
+        break;
+
+    default:
+        break;
+    }
+
+    Event event(type);
+    event.keyEvent.key = Event::Key(key);
+
+    _eventQueue.push(event);
+}
+
 /** Constructors */
 
 WindowEventHandler::WindowEventHandler() {
@@ -64,6 +84,7 @@ WindowEventHandler::WindowEventHandler() {
     glfwSetFramebufferSizeCallback(_window, WindowEventHandler::framebuffer_size_callback);
     glfwSetCursorPosCallback(_window, WindowEventHandler::cursor_position_callback);
     glfwSetMouseButtonCallback(_window, WindowEventHandler::mouse_button_callback);
+    glfwSetKeyCallback(_window, WindowEventHandler::key_callback);
 }
 
 WindowEventHandler::~WindowEventHandler() {}
