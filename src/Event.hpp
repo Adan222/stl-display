@@ -1,14 +1,10 @@
 #pragma once
 
-#pragma once
-
 class Event {
-  private:
-    enum class Type { MouseButtonPressed, MouseButtonReleased, MouseMoved };
+  public:
+    enum class Type { None, MouseButtonPressed, MouseButtonReleased, MouseMoved };
 
     enum class MouseButton { Left = 0, Right = 1, Middle = 2 };
-
-    enum class ButtonAction { Press, Release };
 
     struct MouseMoveEvent {
         double x, y;
@@ -16,16 +12,17 @@ class Event {
 
     struct MouseButtonEvent {
         MouseButton button;
-        ButtonAction action;
         double x, y;
     };
 
-  public:
+    Type type;
     union {
         MouseMoveEvent mouseMove;
         MouseButtonEvent mouseButton;
     };
 
-    Event();
+    Event(Type type);
     ~Event();
+
+    explicit operator bool() const;
 };

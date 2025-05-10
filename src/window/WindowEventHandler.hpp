@@ -10,9 +10,11 @@ class WindowEventHandler : public virtual WindowBase {
   private:
     /** Callback methods */
     static void framebuffer_size_callback(GLFWwindow *window, int new_width, int new_height);
+    static void cursor_position_callback(GLFWwindow *window, double x, double y);
+    static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 
     /** Queue  */
-    std::queue<Event> _eventQueue;
+    static std::queue<Event> _eventQueue;
 
   public:
     WindowEventHandler();
@@ -20,5 +22,5 @@ class WindowEventHandler : public virtual WindowBase {
 
     bool isOpen() const;
 
-    void poolEvents();
+    Event poolEvents();
 };
