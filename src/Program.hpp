@@ -20,7 +20,9 @@ class Program {
 
     /** Variables */
     glm::mat4 _modelMatrix;
-    glm::mat4 _rotationMatrix;
+
+    /** Private methods */
+    glm::vec3 mapToArcball(int x, int y);
 
   public:
     Program(unsigned int width, unsigned int height);
@@ -31,5 +33,5 @@ class Program {
     Window *getWindow();
 
     /** Functionality */
-    void handleDrag(int dx, int dy);
+    void handleDrag(int startX, int startY, int endX, int endY);
 };

@@ -1,7 +1,5 @@
 #include "EventHandler.hpp"
 
-#include <iostream>
-
 #include "Event.hpp"
 #include "Program.hpp"
 #include "Window.hpp"
@@ -13,19 +11,20 @@ void EventHandler::handleMouseMovement(const Event &event) {
         auto x = event.mouseMove.x;
         auto y = event.mouseMove.y;
 
-        int dx = x - oldX;
-        int dy = y - oldY;
+        _program->handleDrag(oldX, oldY, x, y);
 
         oldX = x;
         oldY = y;
-
-        _program->handleDrag(dx, dy);
     }
 }
 
 void EventHandler::handleMousePress(const Event &event) {
-    if (event.mouseButton.button == Event::MouseButton::Left)
+    if (event.mouseButton.button == Event::MouseButton::Left) {
         isDragging = true;
+
+        oldX = event.mouseButton.x;
+        oldY = event.mouseButton.y;
+    }
 }
 
 void EventHandler::handleMouseRelease(const Event &event) {

@@ -17,11 +17,31 @@
 /** STL */
 #include "stl/Entity.hpp"
 
+/** Private methods */
+
+glm::vec3 Program::mapToArcball(int x, int y) {
+    int width = window.getWidth();
+    int height = window.getHeight();
+
+    // Normalize vectors
+    float nx = (2.0f * x - width) / width;
+    float ny = (height - 2.0f * y) / height;
+
+    glm::vec3 v(nx, ny, 0.0f);
+    float length2 = nx * nx + ny * ny;
+
+    if (length2 <= 1.0f)
+        v.z = sqrt(1.0f - length2);
+    else
+        v = glm::normalize(v);
+
+    return v;
+}
+
 /** Constructors */
 
 Program::Program(unsigned int width, unsigned int height)
-    : window("OpenGL", width, height), _eventHandler(this), _rotationMatrix(glm::mat4(1.0f)),
-      _modelMatrix(1.0f) {}
+    : window("OpenGL", width, height), _eventHandler(this), _modelMatrix(1.0f) {}
 
 Program::~Program() {}
 
@@ -44,11 +64,7 @@ void Program::run() {
 
         _eventHandler.handleEvents();
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model,
-                            (float)glfwGetTime() * glm::radians(50.0f),
-                            glm::vec3(0.5f, 1.0f, 0.0f));
-        entity.model(model);
+        entity.model(_modelMatrix);
 
         window.draw(entity);
 
@@ -58,4 +74,15 @@ void Program::run() {
 
 Window *Program::getWindow() { return &window; }
 
-void Program::handleDrag(int dx, int dy) {}
+void Program::handleDrag(int startX, int startY, int endX, int endY) {
+    glm::vec3 va = mapToArcball(startX, startY);
+    glm::vec3 vb = mapToArcball(endX, endY);
+
+    float angle = acos(glm::clamp(glm::dot(va, vb), -1.0f, 1.0f));
+    glm::vec3 axis = glm::cross(va, vb);
+
+    if (glm::length(axis) > 0.0001f) {
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::normalize(axis));
+        _modelMatrix = rotationMatrix * _modelMatrix;
+    }
+}
