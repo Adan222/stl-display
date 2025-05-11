@@ -10,8 +10,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include "Color.hpp"
-#include "Drawable.hpp"
 #include "window/WindowDrawHandler.hpp"
 #include "window/WindowEventHandler.hpp"
 
@@ -22,4 +20,7 @@ class Window : public WindowEventHandler, public WindowDrawHandler {
   public:
     Window(const std::string &name, const unsigned int width, const unsigned int height);
     ~Window();
+
+    bool isOpen() const;
+    void close();
 };

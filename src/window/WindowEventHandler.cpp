@@ -91,8 +91,6 @@ WindowEventHandler::~WindowEventHandler() {}
 
 /** Public methods */
 
-bool WindowEventHandler::isOpen() const { return !glfwWindowShouldClose(_window); }
-
 Event WindowEventHandler::poolEvents() {
     if (_eventQueue.empty())
         return Event(Event::Type::None);

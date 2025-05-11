@@ -22,8 +22,6 @@ Program::Program(unsigned int width, unsigned int height) : window("OpenGL", wid
 Program::~Program() {}
 
 void Program::processInput() {
-    auto win = window.getWindow();
-
     while (Event event = window.poolEvents()) {
         switch (event.type) {
         case Event::Type::MouseButtonPressed: {
@@ -39,8 +37,9 @@ void Program::processInput() {
         case Event::Type::KeyPressed: {
             std::cout << "Key: " << (int)event.keyEvent.key << "\n";
             if (event.keyEvent.key == Event::Key::Escape)
-                glfwSetWindowShouldClose(win, GLFW_TRUE);
+                window.close();
 
+            // TODO: Create OpenGL context object, that will handle such functions
             if (event.keyEvent.key == Event::Key::D0)
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

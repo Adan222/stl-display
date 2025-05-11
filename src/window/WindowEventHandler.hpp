@@ -22,7 +22,5 @@ class WindowEventHandler : public virtual WindowBase {
     WindowEventHandler();
     ~WindowEventHandler();
 
-    bool isOpen() const;
-
     Event poolEvents();
 };
