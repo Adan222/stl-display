@@ -1,59 +1,31 @@
 #include "Program.hpp"
 
 #include <cmath>
-#include <iostream>
 
 /** GLM */
+#include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/quaternion_trigonometric.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 /** Lib */
-#include "Event.hpp"
 #include "Window.hpp"
 
 /** STL */
 #include "stl/Entity.hpp"
 
-Program::Program(unsigned int width, unsigned int height) : window("OpenGL", width, height) {}
+/** Constructors */
+
+Program::Program(unsigned int width, unsigned int height)
+    : window("OpenGL", width, height), _eventHandler(this), _rotationMatrix(glm::mat4(1.0f)),
+      _modelMatrix(1.0f) {}
 
 Program::~Program() {}
 
-void Program::processInput() {
-    while (Event event = window.poolEvents()) {
-        switch (event.type) {
-        case Event::Type::MouseButtonPressed: {
-            if (event.mouseButton.button == Event::MouseButton::Left)
-                std::cout << "Left clicked\n";
-
-            if (event.mouseButton.button == Event::MouseButton::Right)
-                std::cout << "Right clicked\n";
-
-            break;
-        }
-
-        case Event::Type::KeyPressed: {
-            std::cout << "Key: " << (int)event.keyEvent.key << "\n";
-            if (event.keyEvent.key == Event::Key::Escape)
-                window.close();
-
-            // TODO: Create OpenGL context object, that will handle such functions
-            if (event.keyEvent.key == Event::Key::D0)
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-            if (event.keyEvent.key == Event::Key::D1)
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-            break;
-        }
-
-        default:
-            break;
-        }
-    }
-}
+/** Public methods */
 
 void Program::run() {
     stl::Entity entity;
@@ -70,7 +42,7 @@ void Program::run() {
     while (window.isOpen()) {
         window.clear({ 0.2f, 0.3f, 0.3f, 1.0f });
 
-        processInput();
+        _eventHandler.handleEvents();
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::rotate(model,
@@ -83,3 +55,7 @@ void Program::run() {
         window.display();
     }
 }
+
+Window *Program::getWindow() { return &window; }
+
+void Program::handleDrag(int dx, int dy) {}

@@ -7,19 +7,29 @@
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
+#include <glm/ext/matrix_float4x4.hpp>
 
 /** Lib */
+#include "EventHandler.hpp"
 #include "Window.hpp"
 
 class Program {
   private:
     Window window;
+    EventHandler _eventHandler;
 
-    void processInput();
+    /** Variables */
+    glm::mat4 _modelMatrix;
+    glm::mat4 _rotationMatrix;
 
   public:
     Program(unsigned int width, unsigned int height);
     ~Program();
 
     void run();
+
+    Window *getWindow();
+
+    /** Functionality */
+    void handleDrag(int dx, int dy);
 };
