@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Event.hpp"
+#include "window/Event.hpp"
 
 // Predefine Program class
 class Program;

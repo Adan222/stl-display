@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Color.hpp"
 #include "Drawable.hpp"
 
+#include "opengl/Color.hpp"
 #include "window/WindowBase.hpp"
 
 class WindowDrawHandler : public virtual WindowBase {

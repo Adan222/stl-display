@@ -12,7 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 /** Lib */
-#include "Window.hpp"
+#include "window/Window.hpp"
 
 /** STL */
 #include "stl/Entity.hpp"

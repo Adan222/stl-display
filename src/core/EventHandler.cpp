@@ -1,8 +1,8 @@
 #include "EventHandler.hpp"
 
-#include "Event.hpp"
 #include "Program.hpp"
-#include "Window.hpp"
+#include "window/Event.hpp"
+#include "window/Window.hpp"
 
 /** Private methods */
 

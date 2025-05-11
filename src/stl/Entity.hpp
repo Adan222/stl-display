@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 
 /** Lib */
-#include "Drawable.hpp"
+#include "window/Drawable.hpp"
 
 namespace stl {
 

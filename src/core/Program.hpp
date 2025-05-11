@@ -11,7 +11,7 @@
 
 /** Lib */
 #include "EventHandler.hpp"
-#include "Window.hpp"
+#include "window/Window.hpp"
 
 class Program {
   private:

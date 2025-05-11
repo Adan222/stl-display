@@ -4,6 +4,7 @@
 
 /** Callback methods */
 
+// TODO: Implement setting member _width and _height
 void WindowEventHandler::framebuffer_size_callback(GLFWwindow *window,
                                                    int new_width,
                                                    int new_height) {

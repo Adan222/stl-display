@@ -8,7 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 /** Lib */
-#include "Vertex.hpp"
+#include "opengl/Vertex.hpp"
 
 namespace stl {
 
