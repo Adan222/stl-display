@@ -13,6 +13,9 @@
 #include "EventHandler.hpp"
 #include "window/Window.hpp"
 
+/** Lib STL */
+#include "stl/Mesh.hpp"
+
 class Program {
   private:
     Window window;
@@ -23,6 +26,7 @@ class Program {
 
     /** Private methods */
     glm::vec3 mapToArcball(int x, int y);
+    void centerModel(const stl::Mesh &mesh);
 
   public:
     Program(unsigned int width, unsigned int height);

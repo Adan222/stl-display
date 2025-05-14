@@ -10,8 +10,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
+#include <memory>
+#include <vector>
 
 /** Lib */
+#include "stl/Mesh.hpp"
+#include "stl/Reader.hpp"
+#include "stl/ReaderFactory.hpp"
 #include "window/Window.hpp"
 
 /** STL */
@@ -38,17 +44,46 @@ glm::vec3 Program::mapToArcball(int x, int y) {
     return v;
 }
 
+void Program::centerModel(const stl::Mesh &mesh) {
+    auto vertices = mesh.getVertices();
+    glm::vec3 min = vertices[0];
+    glm::vec3 max = vertices[0];
+
+    for (auto &v : vertices) {
+        min = glm::min(min, v);
+        max = glm::max(max, v);
+    }
+
+    glm::vec3 center = (min + max) * 0.5f;
+    glm::vec3 size = max - min;
+    float scale = 1.0f / std::max(size.x, std::max(size.y, size.z)); // Fit to unit size
+
+    _modelMatrix = glm::scale(_modelMatrix, glm::vec3(scale));
+    _modelMatrix = glm::translate(_modelMatrix, -center);
+}
+
 /** Constructors */
 
 Program::Program(unsigned int width, unsigned int height)
-    : window("OpenGL", width, height), _eventHandler(this), _modelMatrix(1.0f) {}
+    : window("OpenGL", width, height), _eventHandler(this) {
+    _modelMatrix = glm::mat4(1.0f);
+}
 
 Program::~Program() {}
 
 /** Public methods */
 
 void Program::run() {
-    stl::Entity entity;
+    stl::ReaderFactory factory("/path/path");
+    std::unique_ptr<stl::Reader> reader = factory.getReader();
+
+    stl::Mesh mesh = reader->read();
+
+    // Compute mesh
+    centerModel(mesh);
+
+    // Create entity
+    stl::Entity entity(mesh);
     entity.setup();
 
     glm::mat4 view = glm::mat4(1.0f);
@@ -67,7 +102,6 @@ void Program::run() {
         entity.model(_modelMatrix);
 
         window.draw(entity);
-
         window.display();
     }
 }
