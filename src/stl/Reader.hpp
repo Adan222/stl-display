@@ -9,11 +9,11 @@ namespace stl {
  * Interface for reading .stl files
  */
 class Reader {
-  private:
-    std::fstream _fstream;
+  protected:
+    mutable std::ifstream _fstream;
 
   public:
-    Reader(std::fstream &&fstream);
+    Reader(std::ifstream &&fstream);
     ~Reader();
 
     virtual stl::Mesh read() const = 0;

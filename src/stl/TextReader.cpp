@@ -64,7 +64,7 @@ glm::vec3 stl::TextReader::readVertex(const std::vector<std::string> &line) cons
 }
 /** Constructors */
 
-stl::TextReader::TextReader(std::fstream &&fstream) : stl::Reader(std::move(fstream)) {}
+stl::TextReader::TextReader(std::ifstream &&ifstream) : stl::Reader(std::move(ifstream)) {}
 
 stl::TextReader::~TextReader() {}
 

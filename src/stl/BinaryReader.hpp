@@ -21,7 +21,7 @@ class BinaryReader : public stl::Reader {
 #pragma pack(pop)
 
   public:
-    BinaryReader(std::fstream &&fstream);
+    BinaryReader(std::ifstream &&ifstream);
     ~BinaryReader();
 
     stl::Mesh read() const;

@@ -1,5 +1,5 @@
 #include "Reader.hpp"
 
-stl::Reader::Reader(std::fstream &&fstream) : _fstream(std::move(fstream)) {}
+stl::Reader::Reader(std::ifstream &&ifstream) : _fstream(std::move(ifstream)) {}
 
 stl::Reader::~Reader() { _fstream.close(); }

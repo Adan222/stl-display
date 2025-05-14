@@ -34,7 +34,7 @@ class TextReader : public stl::Reader {
     glm::vec3 readVertex(const std::vector<std::string> &line) const;
 
   public:
-    TextReader(std::fstream &&fstream);
+    TextReader(std::ifstream &&ifstream);
     ~TextReader();
 
     stl::Mesh read() const override;

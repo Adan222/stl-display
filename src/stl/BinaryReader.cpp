@@ -14,7 +14,7 @@
 
 /** Constructors */
 
-stl::BinaryReader::BinaryReader(std::fstream &&fstream) : stl::Reader(std::move(fstream)) {}
+stl::BinaryReader::BinaryReader(std::ifstream &&ifstream) : stl::Reader(std::move(ifstream)) {}
 
 stl::BinaryReader::~BinaryReader() {}
 
