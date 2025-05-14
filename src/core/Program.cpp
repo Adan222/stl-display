@@ -1,9 +1,10 @@
 #include "Program.hpp"
-#include "core/Renderer.hpp"
 
 /** STD */
 #include <iostream>
-#include <stdexcept>
+
+/** Core */
+#include "core/Renderer.hpp"
 
 /** Private methods */
 
