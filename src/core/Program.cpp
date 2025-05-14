@@ -39,7 +39,7 @@ Program::~Program() {}
 
 void Program::run() {
     if (_arguments.size() < 2) {
-        std::cerr << "No STL files given\n";
+        std::cerr << "No STL file given\n";
         printHelpMessage();
         return;
     }
@@ -66,7 +66,7 @@ void Program::run() {
     }
 
     if (stlFile.empty()) {
-        std::cerr << "No STL files provided.\n";
+        std::cerr << "No STL file provided.\n";
         return;
     }
 
