@@ -3,12 +3,9 @@
 
 #include "core/Program.hpp"
 
-int main() {
+int main(int argc, char *argv[]) {
     try {
-        constexpr unsigned int width = 800;
-        constexpr unsigned int height = 600;
-
-        Program program(width, height);
+        Program program(argc, argv);
         program.run();
     } catch (const std::exception &e) {
         std::cerr << e.what() << "\n";
