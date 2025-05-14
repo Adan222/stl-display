@@ -1,6 +1,9 @@
-#include "EventHandler.hpp"
+#include "core/EventHandler.hpp"
 
-#include "Program.hpp"
+/** Core */
+#include "core/Renderer.hpp"
+
+/** Lib OpenGL */
 #include "window/Event.hpp"
 #include "window/Window.hpp"
 
@@ -11,7 +14,7 @@ void EventHandler::handleMouseMovement(const Event &event) {
         auto x = event.mouseMove.x;
         auto y = event.mouseMove.y;
 
-        _program->handleDrag(oldX, oldY, x, y);
+        _renderer->handleDrag(oldX, oldY, x, y);
 
         oldX = x;
         oldY = y;
@@ -33,7 +36,7 @@ void EventHandler::handleMouseRelease(const Event &event) {
 }
 
 void EventHandler::handleKeyPress(const Event &event) {
-    Window *window = _program->getWindow();
+    Window *window = _renderer->getWindow();
 
     if (event.keyEvent.key == Event::Key::Escape)
         window->close();
@@ -48,15 +51,15 @@ void EventHandler::handleKeyPress(const Event &event) {
 
 /** Constructors */
 
-EventHandler::EventHandler(Program *program)
-    : _program(program), isDragging(false), oldX(0), oldY(0) {}
+EventHandler::EventHandler(Renderer *renderer)
+    : _renderer(renderer), isDragging(false), oldX(0), oldY(0) {}
 
 EventHandler::~EventHandler() {}
 
 /** Public methods */
 
 void EventHandler::handleEvents() {
-    Window *window = _program->getWindow();
+    Window *window = _renderer->getWindow();
 
     while (Event event = window->poolEvents()) {
         switch (event.type) {

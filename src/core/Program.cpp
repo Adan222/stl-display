@@ -1,122 +1,76 @@
 #include "Program.hpp"
+#include "core/Renderer.hpp"
 
-#include <cmath>
-
-/** GLM */
-#include <glm/ext/matrix_float4x4.hpp>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/ext/quaternion_trigonometric.hpp>
-#include <glm/ext/vector_float3.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+/** STD */
 #include <iostream>
-#include <memory>
-#include <vector>
-
-/** Lib */
-#include "stl/Mesh.hpp"
-#include "stl/Reader.hpp"
-#include "stl/ReaderFactory.hpp"
-#include "window/Window.hpp"
-
-/** STL */
-#include "stl/Entity.hpp"
+#include <stdexcept>
 
 /** Private methods */
 
-glm::vec3 Program::mapToArcball(int x, int y) {
-    int width = window.getWidth();
-    int height = window.getHeight();
+std::vector<std::string> Program::createArguments(int argc, char *argv[]) {
+    std::vector<std::string> args(argc);
+    for (int i = 0; i < argc; i++)
+        args[i] = std::string(argv[i]);
 
-    // Normalize vectors
-    float nx = (2.0f * x - width) / width;
-    float ny = (height - 2.0f * y) / height;
-
-    glm::vec3 v(nx, ny, 0.0f);
-    float length2 = nx * nx + ny * ny;
-
-    if (length2 <= 1.0f)
-        v.z = sqrt(1.0f - length2);
-    else
-        v = glm::normalize(v);
-
-    return v;
+    return args;
 }
 
-void Program::centerModel(const stl::Mesh &mesh) {
-    auto vertices = mesh.getVertices();
-    glm::vec3 min = vertices[0];
-    glm::vec3 max = vertices[0];
+void Program::printHelpMessage() const {
+    std::cout << "Usage: stl_display [options] <file.stl>\n"
+              << "Options:\n"
+              << "  -h, --help              Show this help message\n";
+}
 
-    for (auto &v : vertices) {
-        min = glm::min(min, v);
-        max = glm::max(max, v);
-    }
+bool Program::endsWith(const std::string &fullString, const std::string &ending) {
+    if (ending.size() > fullString.size())
+        return false;
 
-    glm::vec3 center = (min + max) * 0.5f;
-    glm::vec3 size = max - min;
-    float scale = 1.0f / std::max(size.x, std::max(size.y, size.z)); // Fit to unit size
-
-    _modelMatrix = glm::scale(_modelMatrix, glm::vec3(scale));
-    _modelMatrix = glm::translate(_modelMatrix, -center);
+    return fullString.compare(fullString.size() - ending.size(), ending.size(), ending) == 0;
 }
 
 /** Constructors */
 
-Program::Program(unsigned int width, unsigned int height)
-    : window("OpenGL", width, height), _eventHandler(this) {
-    _modelMatrix = glm::mat4(1.0f);
-}
+Program::Program(int argc, char *argv[]) { _arguments = createArguments(argc, argv); }
 
 Program::~Program() {}
 
 /** Public methods */
 
 void Program::run() {
-    stl::ReaderFactory factory("/path/path");
-    std::unique_ptr<stl::Reader> reader = factory.getReader();
-
-    stl::Mesh mesh = reader->read();
-
-    // Compute mesh
-    centerModel(mesh);
-
-    // Create entity
-    stl::Entity entity(mesh);
-    entity.setup();
-
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    entity.view(view);
-
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-    entity.projection(projection);
-
-    while (window.isOpen()) {
-        window.clear({ 0.2f, 0.3f, 0.3f, 1.0f });
-
-        _eventHandler.handleEvents();
-
-        entity.model(_modelMatrix);
-
-        window.draw(entity);
-        window.display();
+    if (_arguments.size() < 2) {
+        std::cerr << "No STL file given\n";
+        printHelpMessage();
+        return;
     }
-}
 
-Window *Program::getWindow() { return &window; }
+    // Settings
+    std::string stlFile;
 
-void Program::handleDrag(int startX, int startY, int endX, int endY) {
-    glm::vec3 va = mapToArcball(startX, startY);
-    glm::vec3 vb = mapToArcball(endX, endY);
+    for (int i = 1; i < _arguments.size(); ++i) {
+        const std::string &arg = _arguments[i];
 
-    float angle = acos(glm::clamp(glm::dot(va, vb), -1.0f, 1.0f));
-    glm::vec3 axis = glm::cross(va, vb);
+        if (arg == "-h" || arg == "--help") {
+            printHelpMessage();
+            return;
+        }
 
-    if (glm::length(axis) > 0.0001f) {
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::normalize(axis));
-        _modelMatrix = rotationMatrix * _modelMatrix;
+        else if (endsWith(arg, ".stl"))
+            stlFile = arg;
+
+        else {
+            std::cerr << "Unknown argument: " << arg << "\n";
+            printHelpMessage();
+            return;
+        }
     }
+
+    if (stlFile.empty()) {
+        std::cerr << "No STL file provided.\n";
+        return;
+    }
+
+    constexpr unsigned int width = 800;
+    constexpr unsigned int height = 600;
+    Renderer renderer(width, height);
+    renderer.run(stlFile);
 }

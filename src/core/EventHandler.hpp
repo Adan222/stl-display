@@ -1,9 +1,10 @@
 #pragma once
 
+/** Lib OpenGL */
 #include "window/Event.hpp"
 
 // Predefine Program class
-class Program;
+class Renderer;
 
 /**
  * This class is responsible for handling widnow events
@@ -11,7 +12,7 @@ class Program;
  */
 class EventHandler {
   private:
-    Program *_program;
+    Renderer *_renderer;
 
     /** Handlers */
     void handleMouseMovement(const Event &event);
@@ -25,7 +26,7 @@ class EventHandler {
     int oldY;
 
   public:
-    EventHandler(Program *program);
+    EventHandler(Renderer *renderer);
     ~EventHandler();
 
     void handleEvents();
