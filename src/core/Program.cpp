@@ -17,7 +17,7 @@ std::vector<std::string> Program::createArguments(int argc, char *argv[]) {
 }
 
 void Program::printHelpMessage() const {
-    std::cout << "Usage: stl_display [options] <file.stl>\n"
+    std::cout << "Usage: stlviewer [options] <file.stl>\n"
               << "Options:\n"
               << "  -h, --help              Show this help message\n";
 }
