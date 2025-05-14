@@ -2,7 +2,8 @@
 
 /** Constructors */
 
-stl::Mesh::Mesh(const std::vector<glm::vec3> &vertices) : _vertices(vertices) {}
+stl::Mesh::Mesh(const std::vector<glm::vec3> &vertices)
+    : _vertices(vertices), _verticesCount(vertices.size()), _rawDataCount(vertices.size() * 3) {}
 
 stl::Mesh::~Mesh() {}
 
@@ -22,3 +23,7 @@ std::vector<float> stl::Mesh::getRawData() const {
 
     return rawFloats;
 }
+
+unsigned int stl::Mesh::getVerticesCount() const { return _verticesCount; }
+
+unsigned int stl::Mesh::getRawDataCount() const { return _rawDataCount; }

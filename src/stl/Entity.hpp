@@ -1,29 +1,28 @@
 #pragma once
 
-/** OpenGL classes */
-#include "opengl/ShaderProgram.hpp"
-#include "opengl/Texture.hpp"
-#include "opengl/VertexArrayObject.hpp"
-
 /** GLM */
 #include <glm/glm.hpp>
 
-/** Lib */
+/** LIB OpenGL */
+#include "opengl/ShaderProgram.hpp"
+#include "opengl/VertexArrayObject.hpp"
+
 #include "window/Drawable.hpp"
+
+/** Lib STL */
+#include "stl/Mesh.hpp"
 
 namespace stl {
 
 class Entity : public Drawable {
   private:
+    const Mesh mesh;
+
     VertexArrayObject _vao;
     ShaderProgram _shaderProgram;
 
-    // Textures
-    Texture _brick_texture;
-    Texture _face_texture;
-
   public:
-    Entity();
+    Entity(const Mesh &mesh);
     ~Entity();
 
     void setup();
