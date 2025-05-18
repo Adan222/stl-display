@@ -6,6 +6,9 @@
 /** Core */
 #include "core/Renderer.hpp"
 
+/** Utils */
+#include "utils/String.hpp"
+
 /** Private methods */
 
 std::vector<std::string> Program::createArguments(int argc, char *argv[]) {
@@ -20,13 +23,6 @@ void Program::printHelpMessage() const {
     std::cout << "Usage: stlviewer [options] <file.stl>\n"
               << "Options:\n"
               << "  -h, --help              Show this help message\n";
-}
-
-bool Program::endsWith(const std::string &fullString, const std::string &ending) {
-    if (ending.size() > fullString.size())
-        return false;
-
-    return fullString.compare(fullString.size() - ending.size(), ending.size(), ending) == 0;
 }
 
 /** Constructors */
@@ -55,7 +51,7 @@ void Program::run() {
             return;
         }
 
-        else if (endsWith(arg, ".stl"))
+        else if (utils::string::endsWith(arg, ".stl"))
             stlFile = arg;
 
         else {
