@@ -50,17 +50,17 @@ void Entity::setup() {
     _vao.configureAttribute(vertexConfig);
 }
 
-void Entity::model(const glm::mat4 &matrix) const {
+void Entity::setModelMatrix(const glm::mat4 &matrix) const {
     _shaderProgram.useProgram();
     _shaderProgram.setUniformMatrix4f("model", glm::value_ptr(matrix));
 }
 
-void Entity::view(const glm::mat4 &matrix) const {
+void Entity::setViewMatrix(const glm::mat4 &matrix) const {
     _shaderProgram.useProgram();
     _shaderProgram.setUniformMatrix4f("view", glm::value_ptr(matrix));
 }
 
-void Entity::projection(const glm::mat4 &matrix) const {
+void Entity::setProjectionMatrix(const glm::mat4 &matrix) const {
     _shaderProgram.useProgram();
     _shaderProgram.setUniformMatrix4f("projection", glm::value_ptr(matrix));
 }

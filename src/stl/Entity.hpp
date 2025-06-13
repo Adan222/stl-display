@@ -27,9 +27,10 @@ class Entity : public Drawable {
 
     void setup();
 
-    void model(const glm::mat4 &matrix) const;
-    void view(const glm::mat4 &matrix) const;
-    void projection(const glm::mat4 &matrix) const;
+    /** Matrix setters */
+    void setModelMatrix(const glm::mat4 &matrix) const;
+    void setViewMatrix(const glm::mat4 &matrix) const;
+    void setProjectionMatrix(const glm::mat4 &matrix) const;
 
     void draw() const;
 };
